@@ -26,6 +26,11 @@ class Application implements ApplicationInterface
 
         if (!empty(self::$config['Modules'])) {
             foreach (self::$config['Modules'] as $moduleName => $modulePath) {
+                $moduleName = explode("/", $moduleName);
+                $moduleName = preg_replace_callback('/-\w/i', function($matches) {
+                    return substr(strtoupper($matches[0]), 1);
+                }, $moduleName[1]);
+                $moduleName = ucfirst($moduleName);
                 $initClassName = "\\".$moduleName."\\Bootstrap\\Init";
                 if (class_exists($initClassName)) {
                     $init = new $initClassName();
@@ -76,9 +81,9 @@ class Application implements ApplicationInterface
 
     public static function moduleNameToPath($moduleName)
     {
-        $path = __DIR__."/../../../".strtolower($moduleName)."/";
+        $path = __DIR__."/../../../".$moduleName;
         if (!file_exists($path)) {
-            $path = __DIR__."/../../vendor/iagafonov/".strtolower($moduleName)."/";
+            $path = __DIR__."/../../vendor/".strtolower($moduleName)."/";
             if (!file_exists($path)) {
                 header("HTTP/1.1 500 Internal server error");
                 throw new \Exception(json_encode(['error' => ['code' => 140, 'text' => 'Module path not found']]));

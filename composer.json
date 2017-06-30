@@ -24,6 +24,6 @@
   "require-dev": {
     "satooshi/php-coveralls": "^1.0",
     "codeception/codeception": "^2.3",
-    "iagafonov/mymodule": "^0.0"
+    "iagafonov/my-module": "^0.0"
   }
 }
