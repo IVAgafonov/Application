@@ -67,7 +67,7 @@ class ApplicationTest extends \Codeception\Test\Unit
     {
         $config = [
             'Modules' => [
-                'controller'
+                'iagafonov/controller'
             ],
             'Router' => [
                 'Controller' => [
@@ -88,7 +88,7 @@ class ApplicationTest extends \Codeception\Test\Unit
     {
         $config = [
             'Modules' => [
-                'MyModule'
+                'iagafonov/my-module'
             ],
             'Router' => [
                 'Controller' => [
@@ -106,7 +106,7 @@ class ApplicationTest extends \Codeception\Test\Unit
     {
         $config = [
             'Modules' => [
-                'MyModule'
+                'iagafonov/my-module'
             ],
             'Router' => [
                 'Controller' => [
@@ -120,7 +120,7 @@ class ApplicationTest extends \Codeception\Test\Unit
         $this->expectOutputString('{"status":"ok","module":"MyModule"}{"status":"ok","module":"MyModule"}{"status":"ok","module":"MyModule"}');
 
         $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['PATH_INFO'] = 'api/v1/my-module/index';
+        $_SERVER['PATH_INFO'] = 'api/my-module/index';
 
         \IVAgafonov\System\Application::init($config);
         \IVAgafonov\System\Application::run('MyModule');
