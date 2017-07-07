@@ -96,10 +96,32 @@ class ApplicationTest extends \Codeception\Test\Unit
                         'Module' => '\MyModule\Controller\Factory\ModuleControllerFactory'
                     ]
                 ]
+            ],
+            'Services' => [
+                'defaultDataProvider' => [
+                    'object' => '\IVAgafonov\System\DataProvider',
+                    'config' => [
+                        'dbHost' => 'localhost',
+                        'dbName' => 'test',
+                        'dbUser' => 'root',
+                        'dbPass' => ''
+                    ]
+                ],
+                'defaultStdClass' => [
+                    'object' => '\stdClass'
+                ],
+                'defaultStdClassExists' => [
+                    'object' => '\stdClass'
+                ]
             ]
         ];
+
+        \IVAgafonov\System\Application::$services['defaultStdClassExists'] = new \stdClass();
+
         \IVAgafonov\System\Application::init($config);
         $this->assertFalse(empty(\IVAgafonov\System\Application::$config['Modules']));
+        $this->assertInstanceOf('\IVAgafonov\System\DataProvider', \IVAgafonov\System\Application::$services['defaultDataProvider']);
+        $this->assertInstanceOf('\stdClass', \IVAgafonov\System\Application::$services['defaultStdClass']);
     }
 
     public function testRunApplicationWithValidConfig()
