@@ -5,12 +5,13 @@ namespace IVAgafonov\System;
 class Application implements ApplicationInterface
 {
     static $config = [];
+    static $services = [];
 
     public static function init($config)
     {
         self::loadModules($config);
         unset($config['Modules']);
-        self::$config = array_merge_recursive(self::$config, $config);
+        self::$config = array_replace_recursive(self::$config, $config);
     }
 
     public static function loadModules($config)
@@ -22,6 +23,22 @@ class Application implements ApplicationInterface
 
         foreach ($config['Modules'] as $module) {
             self::loadModule($module);
+        }
+
+        if (!empty($config['Services']) && is_array($config['Services'])) {
+            foreach ($config['Services'] as $serviceName => $serviceData) {
+                if (!empty(self::$services[$serviceName])) {
+                    continue;
+                }
+                if (!empty($serviceData['object']) && class_exists($serviceData['object'])) {
+                    $class = $serviceData['object'];
+                    if (isset($serviceData['config'])) {
+                        self::$services[$serviceName] = new $class($serviceData['config']);
+                    } else {
+                        self::$services[$serviceName] = new $class();
+                    }
+                }
+            }
         }
 
         if (!empty(self::$config['Modules'])) {
@@ -52,7 +69,7 @@ class Application implements ApplicationInterface
             $modules = include $applicationConfig;
             $config = include $moduleConfig;
             if ($config && is_array($config)) {
-                self::$config = array_merge_recursive(self::$config, $config);
+                self::$config = array_replace_recursive(self::$config, $config);
             }
             if ($modules['Modules'] && is_array($modules['Modules']) ) {
                 foreach ($modules['Modules'] as $module) {
