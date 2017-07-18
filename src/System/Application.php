@@ -78,7 +78,7 @@ class Application implements ApplicationInterface
     public static function parseParams()
     {
         self::$config['current']['params'] = [];
-        switch(self::$config['current']['params']) {
+        switch(self::$config['current']['method']) {
             case 'GET':
                 self::$config['current']['params'] = $_GET;
                 break;

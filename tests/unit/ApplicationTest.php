@@ -99,7 +99,7 @@ class ApplicationTest extends \Codeception\Test\Unit
 
     public function testInitApplicationWithValidConfig()
     {
-        $_SERVER['PATH_INFO'] = '/api/v1/controller/action';
+        $_SERVER['PATH_INFO'] = '/api/v1/my-module/index';
         $_SERVER['REQUEST_METHOD'] = 'GET';
 
         $config = [
@@ -108,8 +108,10 @@ class ApplicationTest extends \Codeception\Test\Unit
             ],
             'Router' => [
                 'Controller' => [
-                    'Factory' => [
-                        'Module' => '\MyModule\Controller\Factory\ModuleControllerFactory'
+                    'v1' => [
+                        'Factory' => [
+                            'Module' => '\MyModule\Controller\Factory\ModuleControllerFactory'
+                        ]
                     ]
                 ]
             ],
@@ -157,6 +159,33 @@ class ApplicationTest extends \Codeception\Test\Unit
                         ]
                     ]
                 ]
+            ],
+        ];
+
+        $this->expectOutputString('{"status":"ok","module":"MyModule"}{"status":"ok","module":"MyModule"}{"status":"ok","module":"MyModule"}');
+
+        \IVAgafonov\System\Application::init($config);
+        \IVAgafonov\System\Application::run('MyModule');
+        $this->assertFalse(empty(\IVAgafonov\System\Application::$config['Modules']));
+    }
+
+    public function testRunApplicationWithValidConfigPOST()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'POST';
+        $_SERVER['PATH_INFO'] = 'api/v1/my-module/index';
+
+        $config = [
+            'Modules' => [
+                'iagafonov/my-module'
+            ],
+            'Router' => [
+                'Controller' => [
+                    'v1' => [
+                        'Factory' => [
+                            'MyModule' => '\MyModule\Controller\Factory\ModuleControllerFactory'
+                        ]
+                    ]
+                ]
             ]
         ];
 
@@ -165,5 +194,112 @@ class ApplicationTest extends \Codeception\Test\Unit
         \IVAgafonov\System\Application::init($config);
         \IVAgafonov\System\Application::run('MyModule');
         $this->assertFalse(empty(\IVAgafonov\System\Application::$config['Modules']));
+    }
+
+    public function testRunApplicationWithValidConfigPUT()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'PUT';
+        $_SERVER['PATH_INFO'] = 'api/v1/my-module/index';
+
+        $config = [
+            'Modules' => [
+                'iagafonov/my-module'
+            ],
+            'Router' => [
+                'Controller' => [
+                    'v1' => [
+                        'Factory' => [
+                            'MyModule' => '\MyModule\Controller\Factory\ModuleControllerFactory'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->expectOutputString('{"status":"ok","module":"MyModule"}{"status":"ok","module":"MyModule"}{"status":"ok","module":"MyModule"}');
+
+        \IVAgafonov\System\Application::init($config);
+        \IVAgafonov\System\Application::run('MyModule');
+        $this->assertFalse(empty(\IVAgafonov\System\Application::$config['Modules']));
+    }
+
+    public function testRunApplicationWithInvalidMethod()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'POSTS';
+        $_SERVER['PATH_INFO'] = 'api/v1/my-module/index';
+
+        $config = [
+            'Modules' => [
+                'iagafonov/my-module'
+            ],
+            'Router' => [
+                'Controller' => [
+                    'v1' => [
+                        'Factory' => [
+                            'MyModule' => '\MyModule\Controller\Factory\ModuleControllerFactory'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("{\"error\":{\"code\":405,\"text\":\"Router: Method not allowed\"}}");
+
+        \IVAgafonov\System\Application::init($config);
+        \IVAgafonov\System\Application::run('MyModule');
+    }
+
+    public function testRunApplicationWithEmptyMethod()
+    {
+        $_SERVER['PATH_INFO'] = 'api/v1/my-module/index';
+
+        $config = [
+            'Modules' => [
+                'iagafonov/my-module'
+            ],
+            'Router' => [
+                'Controller' => [
+                    'v1' => [
+                        'Factory' => [
+                            'MyModule' => '\MyModule\Controller\Factory\ModuleControllerFactory'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("{\"error\":{\"code\":11,\"text\":\"Router: Invalid request method\"}}");
+
+        \IVAgafonov\System\Application::init($config);
+        \IVAgafonov\System\Application::run('MyModule');
+
+    }
+
+    public function testRunApplicationWithEmptyPathInfo()
+    {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $config = [
+            'Modules' => [
+                'iagafonov/my-module'
+            ],
+            'Router' => [
+                'Controller' => [
+                    'v1' => [
+                        'Factory' => [
+                            'MyModule' => '\MyModule\Controller\Factory\ModuleControllerFactory'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage("{\"error\":{\"code\":10,\"text\":\"Router: Empty path info\"}}");
+
+        \IVAgafonov\System\Application::init($config);
+        \IVAgafonov\System\Application::run('MyModule');
     }
 }
