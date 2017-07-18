@@ -26,6 +26,7 @@ class Application implements ApplicationInterface
     {
         self::loadEnvironment();
         self::parseParams();
+        $config['current'] = self::$config['current'];
         self::loadModules($config);
         unset($config['Modules']);
         self::$config = array_replace_recursive(self::$config, $config);
