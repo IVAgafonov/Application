@@ -20,13 +20,20 @@ class ApplicationTest extends \Codeception\Test\Unit
     // tests
     public function testInitApplicationEmptyConfig()
     {
+        $_SERVER['PATH_INFO'] = '/api/v1/controller/action';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('{"error":{"code":100,"text":"Invalid application config"}}');
+
         \IVAgafonov\System\Application::init([]);
     }
 
     public function testInitApplicationWithoutModules()
     {
+        $_SERVER['PATH_INFO'] = '/api/v1/controller/action';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
         $config = [
             'Modules' => [
             ],
@@ -44,6 +51,9 @@ class ApplicationTest extends \Codeception\Test\Unit
 
     public function testInitApplicationWithNotExistsModule()
     {
+        $_SERVER['PATH_INFO'] = '/api/v1/controller/action';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
         $config = [
             'Modules' => [
                 'MyModule1'
@@ -65,6 +75,9 @@ class ApplicationTest extends \Codeception\Test\Unit
 
     public function testInitApplicationWithInvalidModule()
     {
+        $_SERVER['PATH_INFO'] = '/api/v1/controller/action';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
         $config = [
             'Modules' => [
                 'iagafonov/controller'
@@ -86,6 +99,9 @@ class ApplicationTest extends \Codeception\Test\Unit
 
     public function testInitApplicationWithValidConfig()
     {
+        $_SERVER['PATH_INFO'] = '/api/v1/controller/action';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
         $config = [
             'Modules' => [
                 'iagafonov/my-module'
@@ -126,23 +142,25 @@ class ApplicationTest extends \Codeception\Test\Unit
 
     public function testRunApplicationWithValidConfig()
     {
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+        $_SERVER['PATH_INFO'] = 'api/v1/my-module/index';
+
         $config = [
             'Modules' => [
                 'iagafonov/my-module'
             ],
             'Router' => [
                 'Controller' => [
-                    'Factory' => [
-                        'MyModule' => '\MyModule\Controller\Factory\ModuleControllerFactory'
+                    'v1' => [
+                        'Factory' => [
+                            'MyModule' => '\MyModule\Controller\Factory\ModuleControllerFactory'
+                        ]
                     ]
                 ]
             ]
         ];
 
         $this->expectOutputString('{"status":"ok","module":"MyModule"}{"status":"ok","module":"MyModule"}{"status":"ok","module":"MyModule"}');
-
-        $_SERVER['REQUEST_METHOD'] = 'GET';
-        $_SERVER['PATH_INFO'] = 'api/my-module/index';
 
         \IVAgafonov\System\Application::init($config);
         \IVAgafonov\System\Application::run('MyModule');
